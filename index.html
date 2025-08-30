@@ -3,51 +3,79 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Life Reset Prototype</title>
+  <title>Life Reset</title>
+
+  <!-- iOS web app -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Life Reset">
+  <link rel="apple-touch-icon" href="icon.png">
+
   <style>
-    :root{--gap:14px;--radius:14px}
+    :root{
+      --gap:14px; --radius:14px;
+      --bg:#f9f9fb; --card:#ffffff; --ink:#222; --muted:#6a6a6a;
+      --border:#e8e8ef; --shadow:0 2px 10px rgba(0,0,0,.06);
+      --brand1:#4f9cff; --brand2:#31d3a3;
+      --tab:#111; --tab-muted:#8a8a8a;
+      --accent:#111;
+    }
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Helvetica,Arial,"Noto Sans KR",sans-serif; margin:0; background:#0f1221; color:#f2f6ff}
-    header{padding:20px; background:linear-gradient(120deg,#2a2f5a,#151936); position:sticky; top:0; z-index:2; border-bottom:1px solid #2b2f53}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Helvetica,Arial,"Noto Sans KR",sans-serif;
+         margin:0; background:var(--bg); color:var(--ink)}
+    header{padding:18px 18px 8px; background:linear-gradient(180deg,#fff,rgba(255,255,255,.85) 60%, rgba(255,255,255,0));
+            position:sticky; top:0; z-index:5; border-bottom:1px solid var(--border); backdrop-filter: blur(6px)}
     h1{font-size:20px; margin:0 0 8px 0; display:flex; align-items:center; gap:8px}
     h1 .logo{font-size:22px}
-    .levelbar{display:flex; align-items:center; gap:10px}
-    .bar{flex:1; height:10px; background:#1b2040; border-radius:99px; overflow:hidden; box-shadow:inset 0 0 0 1px #2b2f53}
-    .fill{height:100%; background:linear-gradient(90deg,#5bd6ff,#60ffa4); width:0%}
-    .meta{font-size:12px; opacity:.9}
-    main{padding:18px}
-    .card{background:#171a33; border:1px solid #282d54; border-radius:var(--radius); padding:14px; margin-bottom:var(--gap); box-shadow:0 8px 24px rgba(0,0,0,.25)}
+    .crest{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:#fff}
+    .crest .tier{font-size:14px; color:var(--muted)}
+    .levelbar{display:flex; align-items:center; gap:10px; margin-top:8px}
+    .bar{flex:1; height:10px; background:#ececf3; border-radius:99px; overflow:hidden; box-shadow:inset 0 0 0 1px var(--border)}
+    .fill{height:100%; background:linear-gradient(90deg,var(--brand1),var(--brand2)); width:0%}
+    .meta{font-size:12px; color:var(--muted)}
+    main{padding:18px 18px 88px} /* leave space for tabbar */
+    .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:var(--gap); box-shadow:var(--shadow)}
     .row{display:flex; gap:10px; flex-wrap:wrap}
-    input,select,button,textarea{border-radius:10px; border:1px solid #2b2f53; background:#0f1433; color:#e7edff; padding:10px 12px; font-size:14px}
-    button{background:#2b7fff; border:0; cursor:pointer}
-    button.ghost{background:#171a33; border:1px solid #2b2f53}
+    input,select,button,textarea{border-radius:10px; border:1px solid var(--border); background:#fff; color:var(--ink); padding:10px 12px; font-size:14px}
+    button{background:#111; color:#fff; border:0; cursor:pointer}
+    button.ghost{background:#fff; border:1px solid var(--border); color:var(--ink)}
     button:disabled{opacity:.5; cursor:not-allowed}
-    .goal{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; border-radius:12px; border:1px solid #2b2f53; background:#11152f; margin-bottom:10px}
+    .goal{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; border-radius:12px;
+          border:1px solid var(--border); background:#fff; margin-bottom:10px}
     .goal .title{font-weight:600}
-    .goal .tags{font-size:12px; opacity:.8}
+    .goal .tags{font-size:12px; color:var(--muted)}
     .goal.done{opacity:.65}
-    .badges{display:flex; gap:8px; flex-wrap:wrap}
-    .badge{padding:8px 10px; border-radius:999px; border:1px solid #2b2f53; background:#11152f; font-size:13px}
-    .empty{opacity:.7; font-size:14px; text-align:center; padding:16px}
-    .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#0e5234; color:#d8ffef; padding:10px 14px; border-radius:999px; border:1px solid #237d59; display:none; z-index:5}
-    .grid{display:grid; grid-template-columns:1fr; gap:var(--gap)}
-    @media(min-width:850px){ .grid{grid-template-columns: 1.2fr 1fr} }
-    .pill{font-size:11px; opacity:.85; border:1px solid #2b2f53; padding:4px 8px; border-radius:999px; background:#171a33}
-    .danger{background:#721d32; border-color:#a63253}
-    .success{background:#1b5533; border-color:#2a8a56}
-    a{color:#86afff}
-    .small{font-size:12px; opacity:.85}
+    .ach-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+    @media(min-width:920px){ .ach-grid{grid-template-columns:repeat(3,1fr)} }
+    .ach{padding:12px; border-radius:12px; border:1px solid var(--border); background:#fff; display:flex; gap:10px; align-items:center; box-shadow:var(--shadow)}
+    .ach.lock{opacity:.45}
+    .empty{color:var(--muted); font-size:14px; text-align:center; padding:16px}
+    .toast{position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:#111; color:#fff; padding:10px 14px; border-radius:999px; display:none; z-index:9}
+    .pill{font-size:11px; color:var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; background:#fff}
+    .small{font-size:12px; color:var(--muted)}
+    .section{display:none}
+    .section.active{display:block}
+    /* Level up modal */
+    .levelup{position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50}
+    .levelup .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.35)}
+    .levelup .box{position:relative; background:#fff; border:1px solid var(--border); padding:20px; border-radius:16px; box-shadow:0 14px 40px rgba(0,0,0,.18); text-align:center; width:min(460px,92vw)}
+    .crest-big{display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:#fff; font-size:20px}
+    .silver{border-color:#bfc8d9}
+    .gold{border-color:#d2b200}
+    .platinum{border-color:#8ac8ff}
+    /* Tab bar */
+    .tabbar{position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--border); display:flex; z-index:10}
+    .tab{flex:1; padding:10px 8px; text-align:center; color:var(--tab-muted); font-size:12px}
+    .tab .icon{font-size:18px; display:block; margin-bottom:2px}
+    .tab.active{color:var(--tab)}
   </style>
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Life Reset">
-<link rel="apple-touch-icon" href="icon.png">
-
 </head>
 <body>
 <header>
-  <h1><span class="logo">🎮</span> Life Reset <span class="pill" id="todayPill"></span></h1>
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
+    <h1 style="margin:0"><span class="logo">🎮</span> Life Reset <span class="pill" id="todayPill"></span></h1>
+    <div class="crest" id="crest"><span id="crestIcon">○</span><span class="tier" id="crestTier">Novice</span></div>
+  </div>
   <div class="levelbar">
     <div class="bar"><div id="xpFill" class="fill"></div></div>
     <div class="meta" id="xpMeta">Lv 1 · 0 / 100 XP</div>
@@ -55,68 +83,94 @@
 </header>
 
 <main>
-  <div class="grid">
-    <section>
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px">
-          <h2 style="margin:0;font-size:16px">오늘의 퀘스트</h2>
-          <div class="small" id="summary"></div>
-        </div>
-        <div id="todayList"></div>
-        <div class="empty" id="emptyToday" style="display:none">오늘 할 퀘스트가 없습니다. 새 목표를 추가하거나 내일 다시 도전해요!</div>
+  <!-- Home -->
+  <section id="sec-home" class="section active">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px">
+        <h2 style="margin:0;font-size:16px">오늘의 퀘스트</h2>
+        <div class="small" id="summary"></div>
       </div>
+      <div id="todayList"></div>
+      <div class="empty" id="emptyToday" style="display:none">오늘 할 퀘스트가 없습니다. 새 목표를 추가하거나 내일 다시 도전해요!</div>
+    </div>
+  </section>
 
-      <div class="card">
-        <h2 style="margin:0 0 10px 0; font-size:16px">목표 추가</h2>
-        <div class="row">
-          <input id="goalTitle" placeholder="예: 30분 러닝 / 1과 사운딩" style="flex:2">
-          <select id="goalType" style="flex:1">
-            <option value="habit">습관(아무 때나)</option>
-            <option value="daily">데일리(하루 1회)</option>
-            <option value="oneoff">일회성</option>
-          </select>
-          <select id="goalDiff" style="flex:1">
-            <option value="1">난이도 ★</option>
-            <option value="2">난이도 ★★</option>
-            <option value="3">난이도 ★★★</option>
-          </select>
-          <button onclick="addGoal()">추가</button>
-        </div>
-        <div class="small" style="margin-top:8px; opacity:.8">완료 시 획득 XP = 10 × 난이도. 일회성은 보너스 2배.</div>
-        <div id="allList" style="margin-top:12px"></div>
+  <!-- Goals -->
+  <section id="sec-goals" class="section">
+    <div class="card">
+      <h2 style="margin:0 0 10px 0; font-size:16px">목표 추가</h2>
+      <div class="row">
+        <input id="goalTitle" placeholder="예: 30분 러닝 / 1과 사운딩" style="flex:2">
+        <select id="goalType" style="flex:1">
+          <option value="habit">습관(아무 때나)</option>
+          <option value="daily">데일리(하루 1회)</option>
+          <option value="oneoff">일회성</option>
+        </select>
+        <select id="goalDiff" style="flex:1">
+          <option value="1">난이도 ★</option>
+          <option value="2">난이도 ★★</option>
+          <option value="3">난이도 ★★★</option>
+        </select>
+        <select id="goalDur" style="flex:1">
+          <option value="10">10분</option>
+          <option value="30">30분</option>
+          <option value="60">1시간</option>
+          <option value="120">2시간</option>
+          <option value="180">3시간</option>
+        </select>
+        <button onclick="addGoal()">추가</button>
       </div>
-    </section>
+      <div class="small" style="margin-top:8px">XP = (10 × 난이도) × 시간계수 · 일회성은 2배. 시간계수: 10분×1.0, 30분×1.5, 1시간×2.0, 2시간×3.0, 3시간×4.0</div>
+    </div>
 
-    <aside>
-      <div class="card">
-        <h2 style="margin:0 0 10px 0; font-size:16px">배지</h2>
-        <div class="badges" id="badges"></div>
-        <div class="empty" id="emptyBadges" style="display:none">아직 배지가 없습니다. 연속 도전으로 배지를 획득하세요!</div>
-      </div>
+    <div class="card">
+      <h2 style="margin:0 0 10px 0; font-size:16px">전체 목표</h2>
+      <div id="allList"></div>
+      <div class="empty" id="emptyAll" style="display:none">등록된 목표가 없습니다. 위에서 목표를 추가해보세요.</div>
+    </div>
+  </section>
 
-      <div class="card">
-        <h2 style="margin:0 0 10px 0; font-size:16px">데이터</h2>
-        <div class="row">
-          <button class="ghost" onclick="exportData()">백업(Export)</button>
-          <button class="ghost" onclick="importData()">복원(Import)</button>
-          <button class="ghost danger" onclick="resetAll()">하드 리셋</button>
-        </div>
-        <p class="small" style="margin-top:8px">데이터는 브라우저의 <b>로컬 저장소</b>에만 저장됩니다. 다른 기기에서는 동기화되지 않습니다.</p>
-      </div>
+  <!-- Achievements -->
+  <section id="sec-ach" class="section">
+    <div class="card">
+      <h2 style="margin:0 0 10px 0; font-size:16px">업적</h2>
+      <div class="ach-grid" id="achList"></div>
+      <div class="empty" id="emptyAch" style="display:none">아직 업적이 없습니다. 연속 도전, 누적 시간, 레벨 달성으로 해금하세요!</div>
+    </div>
+  </section>
 
-      <div class="card">
-        <h2 style="margin:0 0 10px 0; font-size:16px">사용 팁</h2>
-        <ul class="small" style="margin:0 0 0 18px; line-height:1.6">
-          <li>아이폰 Safari에서 이 파일을 열고 공유버튼 → 홈 화면에 추가로 앱처럼 사용.</li>
-          <li>GitHub Pages에 업로드하면 어디서나 접속 가능.</li>
-          <li>습관/데일리는 하루에 한 번만 XP가 지급됩니다.</li>
-        </ul>
+  <!-- Data -->
+  <section id="sec-data" class="section">
+    <div class="card">
+      <h2 style="margin:0 0 10px 0; font-size:16px">데이터 & 백업</h2>
+      <div class="row">
+        <button class="ghost" onclick="exportData()">백업(Export)</button>
+        <button class="ghost" onclick="importData()">복원(Import)</button>
+        <button class="ghost" onclick="resetAll()">하드 리셋</button>
       </div>
-    </aside>
-  </div>
+      <p class="small" style="margin-top:8px">데이터는 브라우저의 <b>로컬 저장소</b>에만 저장됩니다. 다른 기기에서는 동기화되지 않습니다.</p>
+    </div>
+  </section>
 </main>
 
+<!-- Tab bar -->
+<nav class="tabbar">
+  <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="icon">🏠</span>홈</div>
+  <div class="tab" data-tab="goals" onclick="switchTab('goals')"><span class="icon">🎯</span>목표</div>
+  <div class="tab" data-tab="ach" onclick="switchTab('ach')"><span class="icon">🏅</span>업적</div>
+  <div class="tab" data-tab="data" onclick="switchTab('data')"><span class="icon">📊</span>데이터</div>
+</nav>
+
 <div class="toast" id="toast"></div>
+
+<div class="levelup" id="levelUp">
+  <div class="backdrop"></div>
+  <div class="box">
+    <div class="crest-big" id="crestBig"><span id="crestBigIcon">○</span><span id="crestBigTier">Novice</span></div>
+    <h3 id="lvlText" style="margin:10px 0 6px 0">Level Up!</h3>
+    <div class="small">계속해서 퀘스트를 완료하세요.</div>
+  </div>
+</div>
 
 <script>
   // ---------- Utilities ----------
@@ -130,21 +184,33 @@
   };
   const uid = () => Math.random().toString(36).slice(2,9);
 
-  const xpForLevel = (lvl) => 100 * (lvl*lvl);      // lvl 1->100, 2->400, 3->900...
+  const xpForLevel = (lvl) => 100 * (lvl*lvl);      // quadratic progression
   const levelFromXP = (xp) => Math.max(1, Math.floor(Math.sqrt(xp/100)) || 1);
 
   function toast(msg){
     const el = document.getElementById('toast');
     el.textContent = msg; el.style.display='block';
-    setTimeout(()=> el.style.display='none', 1800);
+    setTimeout(()=> el.style.display='none', 1600);
+  }
+
+  // ---------- Tabs ----------
+  function switchTab(name){
+    const map = {home:'sec-home', goals:'sec-goals', ach:'sec-ach', data:'sec-data'};
+    Object.values(map).forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(map[name]).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=> t.classList.remove('active'));
+    document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+    // re-render some derived views
+    render();
   }
 
   // ---------- State ----------
   const defaultState = {
     createdAt: dayStr(),
     xp: 0,
-    goals: [], // {id,title,type,difficulty,streak,lastDone,completed}
-    badges: [] // {id,title,emoji,earnedAt}
+    goals: [], // {id,title,type,difficulty,duration,streak,lastDone,completed}
+    achievements: [], // {id,title,emoji,earnedAt}
+    stats: { totalMinutes:0, lastDayCompletedCount:0, lastDay: dayStr() }
   };
   let state = load();
 
@@ -152,54 +218,121 @@
   function load(){
     try{
       const s = JSON.parse(localStorage.getItem('lifeReset'));
-      return s ? s : structuredClone(defaultState);
+      if (!s) return structuredClone(defaultState);
+      (s.goals||[]).forEach(g=>{ if(!('duration' in g)) g.duration = 30; });
+      if (!s.stats) s.stats = structuredClone(defaultState.stats);
+      if (!s.achievements) s.achievements = [];
+      return s;
     }catch(e){ return structuredClone(defaultState); }
   }
 
-  // ---------- Badge Logic ----------
-  const hasBadge = (id) => state.badges.some(b=>b.id===id);
-  function awardBadge(id,title,emoji){
-    if (!hasBadge(id)){
-      state.badges.push({id,title,emoji,earnedAt: dayStr()});
-      toast(`배지 획득! ${emoji} ${title}`);
+  // ---------- Crest (level tier) ----------
+  function crestTierForLevel(lvl){
+    if (lvl >= 21) return {name:'Mythic', icon:'👑', className:'platinum'};
+    if (lvl >= 11) return {name:'Elite', icon:'⭐', className:'gold'};
+    if (lvl >= 6) return {name:'Adept', icon:'◆', className:'silver'};
+    return {name:'Novice', icon:'○', className:''};
+  }
+  function updateCrest(lvl){
+    const {name, icon, className} = crestTierForLevel(lvl);
+    const crest = document.getElementById('crest');
+    crest.className = 'crest ' + className;
+    document.getElementById('crestIcon').textContent = icon;
+    document.getElementById('crestTier').textContent = name;
+  }
+  function showLevelUp(oldLvl, newLvl){
+    if (newLvl <= oldLvl) return;
+    const {name, icon, className} = crestTierForLevel(newLvl);
+    const box = document.getElementById('levelUp');
+    const crest = document.getElementById('crestBig');
+    crest.className = 'crest-big ' + className;
+    document.getElementById('crestBigIcon').textContent = icon;
+    document.getElementById('crestBigTier').textContent = name;
+    document.getElementById('lvlText').textContent = `Level ${newLvl} 달성!`;
+    box.style.display = 'flex';
+    setTimeout(()=> box.style.display='none', 1400);
+  }
+
+  // ---------- Achievements ----------
+  const hasAch = (id) => state.achievements.some(a=>a.id===id);
+  function earnAch(id,title,emoji){
+    if (!hasAch(id)){
+      state.achievements.push({id,title,emoji,earnedAt: dayStr()});
+      toast(`업적 해금! ${emoji} ${title}`);
     }
   }
-  function checkBadges(){
-    const total = state.goals.length;
-    if (total >= 3) awardBadge('starter','첫 목표 3개 설정','🎯');
-    if (state.xp >= 100) awardBadge('xp100','100 XP 달성','💠');
-    if (state.xp >= 500) awardBadge('xp500','500 XP 달성','🔷');
-    if (state.xp >= 1000) awardBadge('xp1000','1000 XP 달성','💎');
-
+  function checkAchievements(){
+    // Streak-based
     state.goals.forEach(g=>{
-      if (g.streak >= 3) awardBadge('streak3','3일 연속','🔥');
-      if (g.streak >= 7) awardBadge('streak7','7일 연속','⚡️');
-      if (g.streak >= 30) awardBadge('streak30','30일 연속','🏆');
+      if (g.streak >= 3) earnAch('streak3','3일 연속','🔥');
+      if (g.streak >= 7) earnAch('streak7','7일 연속','⚡️');
+      if (g.streak >= 30) earnAch('streak30','30일 연속','🏆');
     });
+    // Time accumulation
+    const hours = state.stats.totalMinutes/60;
+    if (hours >= 10) earnAch('hrs10','누적 10시간','⏱');
+    if (hours >= 50) earnAch('hrs50','누적 50시간','⏱');
+    if (hours >= 200) earnAch('hrs200','누적 200시간','⏱');
+    // Level-based
+    const lvl = levelFromXP(state.xp);
+    if (lvl >= 10) earnAch('lvl10','Lv10 달성','🥈');
+    if (lvl >= 20) earnAch('lvl20','Lv20 달성','🥇');
+    if (lvl >= 30) earnAch('lvl30','Lv30 달성','👑');
+    // Daily mastery
+    if (state.stats.lastDayCompletedCount >= 3) earnAch('daily3','하루 3개 완료','⚔️');
   }
 
-  // ---------- XP + Done ----------
+  // ---------- XP & Completion ----------
+  const durMultiplier = (min)=> ({10:1,30:1.5,60:2,120:3,180:4}[min] || 1);
+  function gainXPForGoal(g){
+    const base = 10 * (g.difficulty||1);
+    const mult = durMultiplier(g.duration||30);
+    let xp = Math.round(base * mult);
+    if (g.type === 'oneoff') xp *= 2;
+    return xp;
+  }
+
+  function updateDailyCounter(){
+    const today = dayStr();
+    if (state.stats.lastDay !== today){
+      state.stats.lastDay = today;
+      state.stats.lastDayCompletedCount = 0;
+    }
+  }
+
   function completeGoal(id){
     const g = state.goals.find(x=>x.id===id);
     if (!g) return;
     const today = dayStr();
     const yest = yesterdayStr();
-    const base = 10 * (g.difficulty||1);
+    updateDailyCounter();
+
+    const oldLvl = levelFromXP(state.xp);
+    const xpGain = gainXPForGoal(g);
+
     if (g.type === 'oneoff'){
       if (g.completed){ toast('이미 완료된 일회성 목표입니다.'); return; }
-      state.xp += base * 2;
+      state.xp += xpGain;
       g.completed = true;
       g.lastDone = today;
       g.streak = (g.streak||0) + 1;
-      toast(`+${base*2} XP! 일회성 완료 🎉`);
+      state.stats.totalMinutes += (g.duration||30);
+      state.stats.lastDayCompletedCount += 1;
+      toast(`+${xpGain} XP! 일회성 완료 🎉`);
     }else{
       if (g.lastDone === today){ toast('오늘은 이미 완료했어요.'); return; }
-      state.xp += base;
+      state.xp += xpGain;
       if (g.lastDone === yest) g.streak = (g.streak||0) + 1; else g.streak = 1;
       g.lastDone = today;
-      toast(`+${base} XP! 잘했어요 ✅`);
+      state.stats.totalMinutes += (g.duration||30);
+      state.stats.lastDayCompletedCount += 1;
+      toast(`+${xpGain} XP! 잘했어요 ✅`);
     }
-    save(); checkBadges(); render();
+
+    const newLvl = levelFromXP(state.xp);
+    if (newLvl > oldLvl) showLevelUp(oldLvl, newLvl);
+
+    save(); checkAchievements(); render();
   }
 
   // ---------- CRUD Goals ----------
@@ -207,10 +340,11 @@
     const title = document.getElementById('goalTitle').value.trim();
     const type = document.getElementById('goalType').value;
     const difficulty = parseInt(document.getElementById('goalDiff').value,10);
+    const duration = parseInt(document.getElementById('goalDur').value,10);
     if (!title){ toast('목표 제목을 입력하세요.'); return; }
-    state.goals.push({id:uid(), title, type, difficulty, streak:0, lastDone:null, completed:false});
+    state.goals.push({id:uid(), title, type, difficulty, duration, streak:0, lastDone:null, completed:false});
     document.getElementById('goalTitle').value='';
-    save(); checkBadges(); render();
+    save(); checkAchievements(); render();
   }
   function removeGoal(id){
     if (confirm('정말 삭제할까요? 진행 데이터가 사라집니다.')){
@@ -253,7 +387,7 @@
 
   // ---------- Render ----------
   function render(){
-    // Header
+    // Header XP
     const lvl = levelFromXP(state.xp);
     const curBase = xpForLevel(lvl);
     const nextBase = xpForLevel(lvl+1);
@@ -262,14 +396,14 @@
     const pct = Math.max(0, Math.min(100, Math.round((curInLevel/need)*100)));
     document.getElementById('xpFill').style.width = pct + '%';
     document.getElementById('xpMeta').textContent = `Lv ${lvl} · ${Math.max(0,curInLevel)} / ${need} XP`;
-
     document.getElementById('todayPill').textContent = `오늘 · ${dayStr()}`;
+    updateCrest(lvl);
 
-    // Today list
+    // Today list (Home)
     const today = dayStr();
     const todayGoals = state.goals.filter(g=>{
-      if (g.type==='oneoff') return !g.completed; // show if not done
-      return g.lastDone !== today; // show if not done yet today
+      if (g.type==='oneoff') return !g.completed;
+      return g.lastDone !== today;
     });
     const todayList = document.getElementById('todayList');
     todayList.innerHTML='';
@@ -277,24 +411,39 @@
     else { document.getElementById('emptyToday').style.display='none'; }
     todayGoals.forEach(g=> todayList.appendChild(goalItem(g,true)));
 
-    // All list
+    // All list (Goals)
     const allList = document.getElementById('allList'); allList.innerHTML='';
+    if (state.goals.length===0) document.getElementById('emptyAll').style.display='block';
+    else document.getElementById('emptyAll').style.display='none';
     state.goals.forEach(g=> allList.appendChild(goalItem(g,false)));
 
     // Summary
     const total = state.goals.length;
     const left = todayGoals.length;
-    document.getElementById('summary').textContent = `총 ${total}개 · 남은 ${left}개`;
+    document.getElementById('summary').textContent = `총 ${total}개 · 남은 ${left}개 · 누적 ${(state.stats.totalMinutes/60).toFixed(1)}h`;
 
-    // Badges
-    const b = document.getElementById('badges'); b.innerHTML='';
-    if (!state.badges.length) document.getElementById('emptyBadges').style.display='block';
-    else document.getElementById('emptyBadges').style.display='none';
-    state.badges.forEach(x=>{
+    // Achievements
+    const a = document.getElementById('achList'); a.innerHTML='';
+    const templates = [
+      {id:'streak3', title:'3일 연속', emoji:'🔥'},
+      {id:'streak7', title:'7일 연속', emoji:'⚡️'},
+      {id:'streak30', title:'30일 연속', emoji:'🏆'},
+      {id:'hrs10', title:'누적 10시간', emoji:'⏱'},
+      {id:'hrs50', title:'누적 50시간', emoji:'⏱'},
+      {id:'hrs200', title:'누적 200시간', emoji:'⏱'},
+      {id:'lvl10', title:'Lv10 달성', emoji:'🥈'},
+      {id:'lvl20', title:'Lv20 달성', emoji:'🥇'},
+      {id:'lvl30', title:'Lv30 달성', emoji:'👑'},
+      {id:'daily3', title:'하루 3개 완료', emoji:'⚔️'}
+    ];
+    templates.forEach(t=>{
+      const earned = hasAch(t.id);
       const el = document.createElement('div');
-      el.className='badge';
-      el.textContent = `${x.emoji} ${x.title}`;
-      b.appendChild(el);
+      el.className = 'ach'+(earned?'':' lock');
+      el.innerHTML = `<div style="font-size:20px">${t.emoji}</div>
+                      <div><div style="font-weight:600">${t.title}</div>
+                      <div class="small">${earned?'해금됨':'잠금'}</div></div>`;
+      a.appendChild(el);
     });
   }
 
@@ -302,11 +451,12 @@
     const el = document.createElement('div');
     const isDoneToday = (g.lastDone === dayStr()) || (g.type==='oneoff' && g.completed);
     el.className = 'goal' + (isDoneToday ? ' done':'');
-    const tags = `${(g.type==='habit'?'습관':g.type==='daily'?'데일리':'일회성')} · ★${g.difficulty} · 연속 ${g.streak||0}일`;
+    const tags = `${(g.type==='habit'?'습관':g.type==='daily'?'데일리':'일회성')} · ★${g.difficulty} · ${g.duration}분 · 연속 ${g.streak||0}일`;
+    const xp = gainXPForGoal(g);
     el.innerHTML = `
       <div style="min-width:0; flex:1">
         <div class="title">${escapeHTML(g.title)}</div>
-        <div class="tags">${tags}</div>
+        <div class="tags">${tags} · 완료 시 +${xp} XP</div>
       </div>
       <div style="display:flex; gap:8px; align-items:center">
         ${showDoneBtn? `<button ${isDoneToday?'disabled':''} onclick="completeGoal('${g.id}')">${isDoneToday?'완료됨':'완료'}</button>`:''}
@@ -321,7 +471,7 @@
   }
 
   // init
-  checkBadges(); render();
+  checkAchievements(); render();
 </script>
 </body>
 </html>
